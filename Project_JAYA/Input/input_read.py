@@ -29,8 +29,8 @@ def Read_csv_into_Data(path, filename):
     print("Returning the following Data")
     print(Data)
     return Data
-
-path = 'C:/Users/gaeta/PycharmProjects/Jaya/Git/Jaya_Project/Jaya_Project/Project_JAYA/Input/'
+#path = 'C:/Users/gaeta/PycharmProjects/Jaya/Git/Jaya_Project/Jaya_Project/Project_JAYA/Input/'
+path = '.'
 filename = 'test_input'
 Data = Read_csv_into_Data(path, filename + '.csv')
 
@@ -83,7 +83,8 @@ def visual():
     plt.ylabel("Longueur [cm]")
     plt.grid()
 
-    save_path = 'C:/Users/gaeta/PycharmProjects/Jaya/Git/Jaya_Project/Jaya_Project/Project_JAYA/Input/Visuals/'
+    #    save_path = 'C:/Users/gaeta/PycharmProjects/Jaya/Git/Jaya_Project/Jaya_Project/Project_JAYA/Input/Visuals/'
+    save_path = 'Visuals/'
     os.chdir(save_path)
     save_fig = input('Do you want to save the figure ? (y or n) :')
     if save_fig == 'y':
