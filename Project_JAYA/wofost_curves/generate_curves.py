@@ -24,8 +24,8 @@ print("PCSE version: %s" %  pcse.__version__)
 
 # CONFIG
 
-crop_name = 'fababean'
-variety_name = 'Faba_bean_801'
+crop_name = 'mungbean'
+variety_name = 'Mungbean_VanHeemst_1988'
 start_date = datetime.datetime(2006, 1, 1, 0, 0)
 end_date = datetime.datetime(2007, 1, 1, 0, 0)
 
