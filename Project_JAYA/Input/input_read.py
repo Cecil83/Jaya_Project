@@ -146,7 +146,6 @@ def visual():
     if save_fig == 'y':
         fig.savefig(filename + datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S') + '.png', bbox_inches='tight', dpi=150)
     plt.show()
-C:\Users\gaeta\PycharmProjects\Jaya\Git\Jaya_Project\Project_JAYA
 
 visual()
 def debug(arg):
