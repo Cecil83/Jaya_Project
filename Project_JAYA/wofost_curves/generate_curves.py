@@ -17,37 +17,14 @@ from pcse.fileinput import YAMLAgroManagementReader
 from pcse.fileinput import ExcelWeatherDataProvider
 from pcse.models import Wofost72_WLP_FD, Wofost72_PP
 
+
 data_dir = os.path.join(os.getcwd(), 'data')
 results_dir = os.path.join(os.getcwd(), 'results')
 print("python version: %s " % sys.version)
 print("PCSE version: %s" %  pcse.__version__)
 
-# CONFIG
-
-crop_name = 'mungbean'
-variety_name = 'Mungbean_VanHeemst_1988'
-start_date = datetime.datetime(2006, 1, 1, 0, 0)
-end_date = datetime.datetime(2007, 1, 1, 0, 0)
-
-weather_config_dict={'irrad': 10000.,
-                     'tmin': 6.4,
-                     'tmax': 15.,
-                     'vap': 1.1,
-                     'wind': 2.8,
-                     'rain': 2.4,
-                     'snowdepth': -999}
-
-
-agro_dict = {'Version': 1.0,
-             'AgroManagement': [{datetime.date(2006, 1, 1): {'CropCalendar': {'crop_name': crop_name,
-                 'variety_name': variety_name,
-                 'crop_start_date': datetime.date(2006, 4, 5),
-                 'crop_start_type': 'emergence',
-                 'crop_end_date': datetime.date(2006, 10, 20),
-                 'crop_end_type': 'harvest',
-                 'max_duration': 300},
-                'TimedEvents': None,
-                'StateEvents': None}}]}
+import config as c
+import parameter_set as p
 
 
 def get_wofost_parameter_set():
@@ -55,7 +32,7 @@ def get_wofost_parameter_set():
     cropd = YAMLCropDataProvider(yaml_repo)
     #print(cropd)
     cropd.get_crops_varieties()
-    cropd.set_active_crop(crop_name, variety_name)
+    cropd.set_active_crop(c.crop_name, c.variety_name)
     #print(cropd)
     
     soilfile = os.path.join(data_dir, 'soil', 'ec3.soil')
@@ -71,7 +48,7 @@ def prepare_agromanagement():
     agromanagement_file = os.path.join(data_dir, 'agro', 'sugarbeet_calendar.agro')
     with open(agromanagement_file, 'w') as file:
         file.flush()
-        yaml.dump(agro_dict, file)
+        yaml.dump(c.agro_dict, file)
     
     agromanagement = YAMLAgroManagementReader(agromanagement_file)
     #print(agromanagement)
@@ -87,8 +64,8 @@ def prepare_fictional_weather_file():
     row_start = 11
     row_end = df.shape[0]-1
     
-    longueur_restante_au_debut = int((row_end - row_start - (end_date - start_date).days)/2)
-    excel_start_datetime = start_date - datetime.timedelta(days=longueur_restante_au_debut)
+    longueur_restante_au_debut = int((row_end - row_start - (c.end_date - c.start_date).days)/2)
+    excel_start_datetime = c.start_date - datetime.timedelta(days=longueur_restante_au_debut)
     
     # On change le df comme il faut
     for i in range(0, row_end-row_start+1):
@@ -96,19 +73,19 @@ def prepare_fictional_weather_file():
         # change datetime
         df.iat[current_row_index, 0] = excel_start_datetime + datetime.timedelta(days=i)
         # irradiation
-        df.iat[current_row_index, 1] = weather_config_dict['irrad']
+        df.iat[current_row_index, 1] = c.weather_config_dict['irrad']
         # tmin
-        df.iat[current_row_index, 2] = weather_config_dict['tmin']
+        df.iat[current_row_index, 2] = c.weather_config_dict['tmin']
         # tmax
-        df.iat[current_row_index, 3] = weather_config_dict['tmax']
+        df.iat[current_row_index, 3] = c.weather_config_dict['tmax']
         # vap
-        df.iat[current_row_index, 4] = weather_config_dict['vap']
+        df.iat[current_row_index, 4] = c.weather_config_dict['vap']
         # wind
-        df.iat[current_row_index, 5] = weather_config_dict['wind']
+        df.iat[current_row_index, 5] = c.weather_config_dict['wind']
         # rain
-        df.iat[current_row_index, 6] = weather_config_dict['rain']
+        df.iat[current_row_index, 6] = c.weather_config_dict['rain']
         # snowdepth
-        df.iat[current_row_index, 7] = weather_config_dict['snowdepth']
+        df.iat[current_row_index, 7] = c.weather_config_dict['snowdepth']
     
     
     writer = pd.ExcelWriter(tmp_weatherfile,
@@ -159,19 +136,26 @@ if __name__=='__main__':
     agromanagement = prepare_agromanagement()
     irrad_list = list()
     twso_max_list = list()
+    
+    fig, ax = plt.subplots()
     for i in range(10):
         new_irrad = float(4000+i*2500)
         irrad_list.append(new_irrad)
         # modify weather_config_file
-        weather_config_dict['irrad'] = new_irrad
+        c.weather_config_dict['irrad'] = new_irrad
         # modify weather file accordingly
         tmp_weatherfile = prepare_fictional_weather_file()
         df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agromanagement)
         result_name = os.path.join(results_dir, f"TWSO_irrad_{new_irrad}.png")
         save_TWSO(df_results,result_name,"TWSO : Total dry weight of living storage organs (kg ha-1)")
         twso_max_list.append(df_results["TWSO"].max())
+        # Graphe commun
+        ax.plot_date(df_results.index, df_results["TWSO"],'-', label=f"{new_irrad/1000:.1f}")
     
-
+    
+    ax.set_title("TWSO : Total dry weight of living storage organs (kg ha-1)")
+    ax.legend(title="Irradiation (MJ/m2/day)")
+    fig.savefig("Irrad_graph.png")
     result_name = os.path.join(results_dir, "TWSO_en_fonction_de_irrad.png")
     fig, ax = plt.subplots()
     ax.plot(irrad_list, twso_max_list, 'g-')
