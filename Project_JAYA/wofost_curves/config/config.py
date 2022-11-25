@@ -1,14 +1,82 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 import datetime
-import config as c
-
 
 from collections import namedtuple
 
 Crop = namedtuple('Crop', ['name', 'variety'])
+
+# CROP CHOICE
+
+"""
+Choix de crops :
+    sunflower, soybean, millet, barley, mungbean, obacco, rapeseed, roundnut,
+    cotton, cowpea, chickpea, sugarbeet, fababean, sugarcane, potato, wheat, 
+    pigeonpea, sorghum, cassava, maize, seed_onion, rice, sweetpotato
+"""
+# Soit itérer sur toutes les crops
+
+#one_crop=False
+one_crop=True
+
+# Si one_crop=True
+crop_name = 'fababean'
+
+# CONFIG
+
+start_date = datetime.datetime(2006, 1, 1, 0, 0)
+end_date = datetime.datetime(2007, 1, 1, 0, 0)
+
+# WEATHER
+# Soleil
+# Soit one_sun=True et une seule valeur d'ensoleillement "sun" est choisie, soit False
+# et 10 valeurs sont prises en partant de sun_min et par step de sun_step
+
+#one_sun=False
+one_sun=True
+
+sun_min = 4000.
+sun_step = 2500.
+
+sun = 10000.0
+
+
+# Température
+# Soit one_sun=True et une seule valeur d'ensoleillement "sun" est choisie, soit False
+# et 10 valeurs sont prises en partant de sun_min et par step de sun_step
+
+#one_temp=False
+one_temp=True
+
+temp_min = -8.5
+temp_step = (26.9 + 8.5 )/ 9
+
+temp = 18.
+
+
+# SOIL
+
+
+# Soit itérer sur tous les soils
+
+#one_soil=False
+one_soil=True
+
+# Si one_soil=True
+soil_name = 'ec3.soil'
+
+
+##########################################################################
+# FIN DU FICHIER CONFIG (La suite est faite pour s'exécuter par import du fichier)
+
+
+
+
+
+
+
+# Soleil, température, eau, nutriment
 
 crop_dict = {'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
              'soybean': Crop(name='soybean', variety='Soybean_901'),
@@ -37,7 +105,40 @@ crop_dict = {'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
 
 # Crop
 
-crop = crop_dict[c.crop_name]
+if one_crop:
+    crops = [crop_dict[crop_name]]
+else:
+    crops = list(crop_dict.values())
+
+# Soil
+
+if one_soil:
+    soils = [soil_name]
+else:
+    soils = ['ec1.soil', 'ec2.soil', 'ec3.soil']
+
+# Soleil
+
+if one_sun:
+    suns = [sun]
+else:
+    suns = [sun_min + sun_step*float(i) for i in range(10)]
+
+# Temperature
+
+if one_temp:
+    temps = temp
+else:
+    temps = [temp_min + temp_step*float(i) for i in range(10)]
+
+
+# Reste à faire l'eau et les nutriments
+
+
+
+##################################################################
+
+# Ici, config de base qui sera modifiée par les scripts
 
 # config
 
@@ -50,11 +151,12 @@ weather_config_dict={'irrad': 10000.,
                      'snowdepth': -999}
 
 
+
 # Agro File Config
 
 agro_dict = {'Version': 1.0,
-             'AgroManagement': [{datetime.date(2006, 1, 1): {'CropCalendar': {'crop_name': crop.name,
-                 'variety_name': crop.variety,
+             'AgroManagement': [{datetime.date(2006, 1, 1): {'CropCalendar': {'crop_name': crop_dict[crop_name].name,
+                 'variety_name': crop_dict[crop_name].variety,
                  'crop_start_date': datetime.date(2006, 4, 5),
                  'crop_start_type': 'emergence',
                  'crop_end_date': datetime.date(2006, 10, 20),

@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 
 import sys, os
 from config.pcse_path import pcse_path
