@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import sys, os
-sys.path.insert(1, '/home/user/Documents/imag/Manintec/Jaya/code/pcse')
+sys.path.insert(1, 'pcse')
 import matplotlib
-matplotlib.style.use("ggplot")
+matplotlib.use
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime,yaml
@@ -112,7 +114,6 @@ def prepare_fictional_weather_file():
     
     
     writer = pd.ExcelWriter(tmp_weatherfile,
-                            engine='xlsxwriter',
                             datetime_format='mm/d/yyyy')
     
     # Convert the dataframe to an XlsxWriter Excel object.
