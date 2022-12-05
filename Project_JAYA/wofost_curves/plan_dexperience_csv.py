@@ -19,6 +19,8 @@ from pcse.base import ParameterProvider
 from pcse.fileinput import YAMLAgroManagementReader
 from pcse.fileinput import ExcelWeatherDataProvider
 from pcse.models import Wofost72_WLP_FD, Wofost72_PP
+from itertools import product
+from tqdm import tqdm
 
 
 data_dir = os.path.join(os.getcwd(), 'data')
@@ -128,31 +130,42 @@ def get_result_of_wofost_run(parameters, weather, agromanagement):
     return df_results
 
 def start_runs_for_weather_parameters(parameters,agro,path):
-    for irrad in c.suns:
-        for temperature in c.temps:
-            for wind in c.winds:
-                for rain in c.rains:
-                    c.weather_config_dict['irrad'] = irrad
-                    c.weather_config_dict['tmin'] = temperature
-                    c.weather_config_dict['tmax'] = temperature
-                    c.weather_config_dict['wind'] = wind
-                    c.weather_config_dict['rain'] = rain
-                    # modify weather file accordingly
-                    tmp_weatherfile = prepare_fictional_weather_file()
-                    df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agro)
-                    filename = f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}_rain_{rain:.1f}_wind_{wind:.1f}.csv"
-                    df_results.to_csv(os.path.join(path,filename))
+    
+    # Loop over irrad, temperature, wind and rain
+    all_runs = product(c.suns, c.temps, c.winds, c.rains)
+    nruns = len(c.suns) * len(c.temps) * len(c.winds) * len(c.rains)
+    #pbar = ProgressBar().start()
+    
+    for inputs in tqdm(all_runs, total=nruns):
+        irrad, temperature, wind, rain = inputs
+        c.weather_config_dict['irrad'] = irrad
+        c.weather_config_dict['tmin'] = temperature
+        c.weather_config_dict['tmax'] = temperature
+        c.weather_config_dict['wind'] = wind
+        c.weather_config_dict['rain'] = rain
+        # modify weather file accordingly
+        tmp_weatherfile = prepare_fictional_weather_file()
+        df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agro)
+        #pbar.update(i+1)        
+        filename = f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}_rain_{rain:.1f}_wind_{wind:.1f}.csv"
+        df_results.to_csv(os.path.join(path,filename))
+    
+    #pbar.finish()
 
 if __name__=='__main__':
     new_res_dir = os.path.join(results_dir,f"{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
     os.mkdir(new_res_dir)
-    for soil in c.soils:
-        for crop in c.crops:
-            parameters = get_wofost_parameter_set(crop, soil)
-            agromanagement = prepare_agromanagement(crop)
-            results_dir_now = os.path.join(new_res_dir, f"{soil}_{crop.name}")
-            os.mkdir(results_dir_now)
-            start_runs_for_weather_parameters(parameters, agromanagement, results_dir_now)
+    all_runs = product(c.soils, c.crops)
+    nruns = len(c.soils) * len(c.crops)
+    for i, inputs in enumerate(all_runs):
+        soil, crop = inputs
+        run_name = f"{soil}_{crop.name}"
+        print(f"{i}/{nruns} ---- {run_name}")
+        parameters = get_wofost_parameter_set(crop, soil)
+        agromanagement = prepare_agromanagement(crop)
+        results_dir_now = os.path.join(new_res_dir, run_name)
+        os.mkdir(results_dir_now)
+        start_runs_for_weather_parameters(parameters, agromanagement, results_dir_now)
             
-    
+        
 
