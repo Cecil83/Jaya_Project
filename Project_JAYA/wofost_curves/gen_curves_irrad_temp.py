@@ -301,7 +301,7 @@ if __name__ == '__main__':
                 if twso_val>irrad_max:
                     irrad_max=twso_val
                 irrad_incr += twso_val
-        analyze_irrad.append((irrad,irrad_min, irrad_incr/dim, irrad_max))
+        analyze_irrad.append((irrad, irrad_min, irrad_incr/dim, irrad_max))
 
     print(analyze_irrad)
     print(analyze_temp)
