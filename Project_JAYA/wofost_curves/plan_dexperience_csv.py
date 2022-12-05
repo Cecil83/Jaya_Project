@@ -48,7 +48,7 @@ def get_wofost_parameter_set(crop,soil):
 
     soilfile = os.path.join(data_dir, 'soil', soil)
     soild = CABOFileReader(soilfile)
-    sited = WOFOST72SiteDataProvider(WAV=10)
+    sited = c.sited
     parameters = ParameterProvider(cropdata=cropd, soildata=soild, sitedata=sited)
     return parameters
 
@@ -116,8 +116,10 @@ def get_result_of_wofost_run(parameters, weather, agromanagement):
     wdp = ExcelWeatherDataProvider(weather)
     #print(wdp)
 
-    wofsim = Wofost72_PP(parameters, wdp, agromanagement)
 
+    #wofsim = Wofost72_PP(parameters, wdp, agromanagement)
+    wofsim = Wofost72_WLP_FD(parameters, wdp, agromanagement)
+    
 
     wofsim.run_till_terminate()
     df_results = pd.DataFrame(wofsim.get_output())
@@ -128,13 +130,18 @@ def get_result_of_wofost_run(parameters, weather, agromanagement):
 def start_runs_for_weather_parameters(parameters,agro,path):
     for irrad in c.suns:
         for temperature in c.temps:
-            c.weather_config_dict['irrad'] = irrad
-            c.weather_config_dict['tmin'] = temperature
-            c.weather_config_dict['tmax'] = temperature
-            # modify weather file accordingly
-            tmp_weatherfile = prepare_fictional_weather_file()
-            df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agro)
-            df_results.to_csv(os.path.join(path,f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}.csv"))
+            for wind in c.winds:
+                for rain in c.rains:
+                    c.weather_config_dict['irrad'] = irrad
+                    c.weather_config_dict['tmin'] = temperature
+                    c.weather_config_dict['tmax'] = temperature
+                    c.weather_config_dict['wind'] = wind
+                    c.weather_config_dict['rain'] = rain
+                    # modify weather file accordingly
+                    tmp_weatherfile = prepare_fictional_weather_file()
+                    df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agro)
+                    filename = f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}_rain_{rain:.1f}_wind_{wind:.1f}.csv"
+                    df_results.to_csv(os.path.join(path,filename))
 
 if __name__=='__main__':
     new_res_dir = os.path.join(results_dir,f"{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")

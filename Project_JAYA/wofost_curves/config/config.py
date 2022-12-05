@@ -3,9 +3,14 @@
 
 import datetime
 
+from pcse.util import WOFOST72SiteDataProvider
+
 from collections import namedtuple
 
 Crop = namedtuple('Crop', ['name', 'variety'])
+
+
+granularite = 2
 
 # CROP CHOICE
 
@@ -33,8 +38,8 @@ end_date = datetime.date(2007, 1, 1)
 # Soit one_sun=True et une seule valeur d'ensoleillement "sun" est choisie, soit False
 # et 10 valeurs sont prises en partant de sun_min et par step de sun_step
 
-#one_sun=False
-one_sun=True
+one_sun=False
+#one_sun=True
 
 sun_min = 4000.
 sun_step = 2500.
@@ -42,15 +47,39 @@ sun_step = 2500.
 sun = 10000.0
 
 
+# Wind
+
+one_wind=False
+#one_wind=True
+
+wind_min = 0.6
+wind_max = 9.9
+wind_step = (wind_max - wind_min )/ (granularite-1)
+
+wind = 2.8
+
+# Rain
+
+one_rain=False
+#one_rain=True
+
+rain_min = 0.
+rain_max = 50.4
+rain_step = (rain_max - rain_min )/ (granularite-1)
+
+rain = 2.4
+
+
 # Température
 # Soit one_sun=True et une seule valeur d'ensoleillement "sun" est choisie, soit False
 # et 10 valeurs sont prises en partant de sun_min et par step de sun_step
 
-#one_temp=False
-one_temp=True
+one_temp=False
+#one_temp=True
 
 temp_min = -8.5
-temp_step = (26.9 + 8.5 )/ 9
+temp_max = 26.9
+temp_step = (temp_max - temp_min )/ (granularite-1)
 
 temp = 18.
 
@@ -72,13 +101,9 @@ soil_name = 'ec3.soil'
 
 
 
-
-
-
-
 # Soleil, température, eau, nutriment
 
-crop_dict = {'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
+crop_dict = {#'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
              #'soybean': Crop(name='soybean', variety='Soybean_901'),
              #'millet': Crop(name='millet', variety='Millet_VanHeemst_1988'),
              #'barley': Crop(name='barley', variety='Spring_barley_301'),
@@ -97,9 +122,9 @@ crop_dict = {'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
              #'pigeonpea': Crop(name='pigeonpea', variety='Pigeonpea_VanHeemst_1988'),
              #'sorghum': Crop(name='sorghum', variety='Sorghum_VanHeemst_1988'),
              #'cassava': Crop(name='cassava', variety='Cassava_VanHeemst_1988'),
-             'maize': Crop(name='maize', variety='Maize_VanHeemst_1988'),
-             'seed_onion': Crop(name='seed_onion', variety='onion_agriadapt'),
-             'rice': Crop(name='rice', variety='Rice_501'),
+             #'maize': Crop(name='maize', variety='Maize_VanHeemst_1988'),
+             #'seed_onion': Crop(name='seed_onion', variety='onion_agriadapt'),
+             #'rice': Crop(name='rice', variety='Rice_501'),
              'sweetpotato': Crop(name='sweetpotato', variety='Sweetpotato_VanHeemst_1988')}
 
 
@@ -122,14 +147,49 @@ else:
 if one_sun:
     suns = [sun]
 else:
-    suns = [sun_min + sun_step*float(i) for i in range(10)]
+    suns = [sun_min + sun_step*float(i) for i in range(granularite)]
+    
+# Wind
+
+if one_wind:
+    winds = [wind]
+else:
+    winds = [wind_min + wind_step*float(i) for i in range(granularite)]
+
+# Rain
+
+if one_rain:
+    rains = [rain]
+else:
+    rains = [rain_min + rain_step*float(i) for i in range(granularite)]
 
 # Temperature
 
 if one_temp:
     temps = [temp]
 else:
-    temps = [temp_min + temp_step*float(i) for i in range(10)]
+    temps = [temp_min + temp_step*float(i) for i in range(granularite)]
+
+
+# Site
+"""
+The following site specific parameter values can be set through this data provider::
+
+    - IFUNRN    Indicates whether non-infiltrating fraction of rain is a function of storm size (1)
+                or not (0). Default 0
+    - NOTINF    Maximum fraction of rain not-infiltrating into the soil [0-1], default 0.
+    - SSMAX     Maximum depth of water that can be stored on the soil surface [cm]
+    - SSI       Initial depth of water stored on the surface [cm]
+    - WAV       Initial amount of water in total soil profile [cm]
+    - SMLIM     Initial maximum moisture content in initial rooting depth zone [0-1], default 0.4
+"""
+                       
+sited = WOFOST72SiteDataProvider(IFUNRN=0,
+                                 NOTINF=0.,
+                                 SSI=0.,
+                                 SSMAX=0,
+                                 WAV=0.,
+                                 SMLIM=0.)
 
 
 # Reste à faire l'eau et les nutriments, et le site (soil profile etc )
