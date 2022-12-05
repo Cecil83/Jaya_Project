@@ -29,10 +29,10 @@ print("PCSE version: %s" % pcse.__version__)
 
 # CONFIG
 
-crop_name = 'mungbean'
-variety_name = 'Mungbean_VanHeemst_1988'
-#crop_name = 'fababean'
-#variety_name = 'Faba_bean_801'
+# crop_name = 'mungbean'
+# variety_name = 'Mungbean_VanHeemst_1988'
+crop_name = 'fababean'
+variety_name = 'Faba_bean_801'
 start_date = datetime.datetime(2006, 1, 1, 0, 0)
 end_date = datetime.datetime(2007, 1, 1, 0, 0)
 
@@ -196,115 +196,118 @@ def Write_csv_from_Data(filename, path, Data_W):
 if __name__ == '__main__':
     parameters = get_wofost_parameter_set()
     agromanagement = prepare_agromanagement()
-    irrad_list = list()
+    rain_list = list()
     twso_max_list = list()
-    temp_list= list()
+    wind_list= list()
 
     # fig1, ax1 = plt.subplots()
     # fig2, ax2 = plt.subplots()
     # fig_dict, ax_dict = dict(), dict()
     # for key in variable_meaning_dict.keys():
     #     fig_dict[key], ax_dict[key] = plt.subplots()
-    dim = 10
+    dim = 5
     results_dir_now = os.path.join(results_dir,
-                                   f"TWSO_{crop_name}_IRRAD_TEMP_dim{dim}{datetime.datetime.now().strftime('%m_%d_%H_%M_%S')}")
+                                   f"TWSO_{crop_name}_IRRAD_wind_dim{dim}{datetime.datetime.now().strftime('%m_%d_%H_%M_%S')}")
     os.mkdir(results_dir_now)
     irrad_min = 100
     irrad_max = 28000
     temp_min = -8.5
     temp_max = 26.9
+    wind_min = 0.6
+    wind_max = 9.9
+    rain_min = 0
+    rain_max = 10
 
     for i in range(dim):
-        new_irrad = round(float(irrad_min + i * (irrad_max-irrad_min)/(dim - 1)),2)
-        irrad_list.append(new_irrad)
+        new_rain = round(float(rain_min + i * (rain_max-rain_min)/(dim - 1)),2)
+        rain_list.append(new_rain)
         # modify weather_config_file
-        weather_config_dict['irrad'] = new_irrad
+        weather_config_dict['rain'] = new_rain
         for j in range(dim):
-            new_temp = round(float(temp_min + j * (temp_max - temp_min) / (dim - 1)), 2)
-            temp_list.append(new_temp)
-            weather_config_dict['tmin'] = new_temp
-            weather_config_dict['tmax'] = new_temp
+            new_wind = round(float(wind_min + j * (wind_max - wind_min) / (dim - 1)), 2)
+            wind_list.append(new_wind)
+            weather_config_dict['wind'] = new_wind
 
             # modify weather file accordingly
             tmp_weatherfile = prepare_fictional_weather_file()
             df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agromanagement)
-            result_name = os.path.join(results_dir_now, f"TWSO_{crop_name}_irrad_{new_irrad}_temp{new_temp}.png")
+            result_name = os.path.join(results_dir_now, f"TWSO_{crop_name}_rain_{new_rain}_wind{new_wind}.png")
             # save_var('TWSO', df_results, result_name)
-            # save_var('LAI', df_results, os.path.join(results_dir_now, f"LAI_{crop_name}_irrad_{new_irrad}.png"))
+            # save_var('LAI', df_results, os.path.join(results_dir_now, f"LAI_{crop_name}_rain_{new_rain}.png"))
 
             twso_max_list.append(df_results["TWSO"].max())
-            df_results.to_csv(os.path.join(results_dir_now, f"TWSO_{crop_name}_irrad_{new_irrad}_temp{new_temp}.csv"))
+            df_results.to_csv(os.path.join(results_dir_now, f"TWSO_{crop_name}_rain_{new_rain}_wind{new_wind}.csv"))
 
             ###
             # for key in variable_meaning_dict.keys():
             #     fig = ax_dict[key].plot(df_results.index, df_results[key], '-', label=f"{new_irrad / 1000:.1f}")
             #     ax_dict[key].legend(title=f"Irradiations in MJ/m2/day ")
             #     ax_dict[key].set_title(f"{key} : {variable_meaning_dict[key]}")
-            #     fig_dict[key].savefig(os.path.join(results_dir_now, f"{key}_irrad_fct_temps.png"))
+            #     fig_dict[key].savefig(os.path.join(results_dir_now, f"{key}_irrad_fct_winds.png"))
             ###
             # ax1.plot(df_results.index, df_results[key], '-', label=f"{new_irrad/1000:.1f}")
             # ax1.legend()
-            # fig1.savefig(os.path.join(results_dir_now, f"{key}_irrad_fct_temps.png"))
+            # fig1.savefig(os.path.join(results_dir_now, f"{key}_irrad_fct_winds.png"))
             #
             # ax2.plot(df_results.index, df_results['LAI'], '-', label=f"{new_irrad/1000:.1f}")
             # ax2.legend()
-            # fig2.savefig(os.path.join(results_dir_now, f"LAI_irrad_fct_temps.png"))
+            # fig2.savefig(os.path.join(results_dir_now, f"LAI_irrad_fct_winds.png"))
             #
-    temp_list=temp_list[:dim]
+    wind_list=wind_list[:dim]
     # result_name = os.path.join(results_dir_now, f"TWSO_{crop_name}_en_fonction_de_irrad.png")
     # fig, ax = plt.subplots()
     # ax.plot(irrad_list, twso_max_list, 'g-')
     # ax.set_title("TWSO (kg ha-1) en fonction de l'irradiation (kJ/m2/day)")
     # plt.savefig(result_name)
-    print(irrad_list)
-    print(temp_list)
+    print(rain_list)
+    print(wind_list)
     print(twso_max_list)
     Data_results, header = [], []
 
     Data_results.append([key for key in weather_config_dict.keys()])
     Data_results.append([weather_config_dict[key] for key in weather_config_dict.keys()])
 
-    Data_results.append(('Irrad_value', 'Temp_value', 'TWSO_harvest_value'))
+    Data_results.append(('rain_value', 'wind_value', 'TWSO_harvest_value'))
     ind = 0
     for i in range(dim):
         for j in range(dim):
-            Data_results.append((irrad_list[i], temp_list[j], twso_max_list[ind]))
+            Data_results.append((rain_list[i], wind_list[j], twso_max_list[ind]))
             ind+=1
 
-    Write_csv_from_Data(f"Results_{crop_name}_irrad_temp{new_temp}.csv", results_dir_now, Data_results)
+    Write_csv_from_Data(f"Results_{crop_name}_rain_wind{new_wind}.csv", results_dir_now, Data_results)
 
     end_timer = time.perf_counter()
     print(f"Simulation time is {(end_timer-start_timer)/1:.1f}")
 
-    analyze_temp = [('Température', 'Min', 'Moy', 'Max')]
-    analyze_irrad = [('Irradiation', 'Min', 'Moy', 'Max')]
+    analyze_wind = [('wind', 'Min', 'Moy', 'Max')]
+    analyze_rain = [('rain', 'Min', 'Moy', 'Max')]
 
-    for temp in temp_list:
-        temp_min, temp_incr, temp_max = 7000, 0, 0
+    for wind in wind_list:
+        wind_min, wind_incr, wind_max = 7000, 0, 0
         for i in range(dim**2):
-            if Data_results[i+3][1]==temp:
+            if Data_results[i+3][1]==wind:
                 twso_val = Data_results[i+3][2]
-                if twso_val<temp_min:
-                    temp_min=twso_val
-                if twso_val>temp_max:
-                    temp_max=twso_val
-                temp_incr += twso_val
-        analyze_temp.append((temp,temp_min, temp_incr/dim, temp_max))
+                if twso_val<wind_min:
+                    wind_min=twso_val
+                if twso_val>wind_max:
+                    wind_max=twso_val
+                wind_incr += twso_val
+        analyze_wind.append((wind,wind_min, wind_incr/dim, wind_max))
 
-    for irrad in irrad_list:
-        irrad_min, irrad_incr, irrad_max = 7000, 0, 0
+    for rain in rain_list:
+        rain_min, rain_incr, rain_max = 7000, 0, 0
         for i in range(dim**2):
-            if Data_results[i+3][0]==irrad:
+            if Data_results[i+3][0]==rain:
                 twso_val = Data_results[i+3][2]
-                if twso_val<irrad_min:
-                    irrad_min=twso_val
-                if twso_val>irrad_max:
-                    irrad_max=twso_val
-                irrad_incr += twso_val
-        analyze_irrad.append((irrad,irrad_min, irrad_incr/dim, irrad_max))
+                if twso_val<rain_min:
+                    rain_min=twso_val
+                if twso_val>rain_max:
+                    rain_max=twso_val
+                rain_incr += twso_val
+        analyze_rain.append((rain,rain_min, rain_incr/dim, rain_max))
 
-    print(analyze_irrad)
-    print(analyze_temp)
+    print(analyze_rain)
+    print(analyze_wind)
 
     abs_max, index = 0, 0
     for i in range(dim**2):
@@ -312,11 +315,10 @@ if __name__ == '__main__':
             abs_max=Data_results[i+3][2]
             index = i+3
 
-    print(f"TWSO max value is {abs_max} and was reach for temp = {Data_results[index][1]} and irrad = {Data_results[index][0]}")
+    print(f"TWSO max value is {abs_max} and was reach for wind = {Data_results[index][1]} and rain = {Data_results[index][0]}")
 
-    Analyse_results = analyze_temp
-    for i in range(len(analyze_irrad)):
-        Analyse_results.append(analyze_irrad[i])
-    Analyse_results.append((f"TWSO max value is {abs_max} and was reach for temp = {Data_results[index][1]} and irrad = {Data_results[index][0]}"))
-    Analyse_results.append((f"Simulation time is {(end_timer-start_timer)/1:.1f}"))
-    Write_csv_from_Data(f"Analyse_Results_IRRAD_TEMP_dim{dim}.csv", results_dir_now, Analyse_results)
+    Analyse_results = analyze_wind
+    for i in range(len(analyze_rain)):
+        Analyse_results.append(analyze_rain[i])
+    Analyse_results.append((f"TWSO max value is {abs_max} and was reach for wind = {Data_results[index][1]} and rain = {Data_results[index][0]}",0,0,0))
+    Write_csv_from_Data(f"Analyse_Results_rain_wind_dim{dim}.csv", results_dir_now, Analyse_results)

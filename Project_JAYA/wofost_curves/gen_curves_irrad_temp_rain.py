@@ -29,10 +29,10 @@ print("PCSE version: %s" % pcse.__version__)
 
 # CONFIG
 
-crop_name = 'mungbean'
-variety_name = 'Mungbean_VanHeemst_1988'
-#crop_name = 'fababean'
-#variety_name = 'Faba_bean_801'
+# crop_name = 'mungbean'
+# variety_name = 'Mungbean_VanHeemst_1988'
+crop_name = 'fababean'
+variety_name = 'Faba_bean_801'
 start_date = datetime.datetime(2006, 1, 1, 0, 0)
 end_date = datetime.datetime(2007, 1, 1, 0, 0)
 
@@ -149,8 +149,7 @@ def get_result_of_wofost_run(parameters, weather, agromanagement):
     wdp = ExcelWeatherDataProvider(weather)
     # print(wdp)
 
-    #wofsim = Wofost72_PP(parameters, wdp, agromanagement)
-    wofsim = Wofost72_WLP_FD(parameters, wdp, agromanagement)
+    wofsim = Wofost72_PP(parameters, wdp, agromanagement)
 
     wofsim.run_till_terminate()
     df_results = pd.DataFrame(wofsim.get_output())
@@ -199,28 +198,21 @@ if __name__ == '__main__':
     irrad_list = list()
     twso_max_list = list()
     temp_list= list()
-
-    # fig1, ax1 = plt.subplots()
-    # fig2, ax2 = plt.subplots()
-    # fig_dict, ax_dict = dict(), dict()
-    # for key in variable_meaning_dict.keys():
-    #     fig_dict[key], ax_dict[key] = plt.subplots()
-    dim = 10
     results_dir_now = os.path.join(results_dir,
-                                   f"TWSO_{crop_name}_IRRAD_TEMP_dim{dim}{datetime.datetime.now().strftime('%m_%d_%H_%M_%S')}")
+                                   f"TWSO_{crop_name}_IRRAD_TEMP{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
     os.mkdir(results_dir_now)
-    irrad_min = 100
-    irrad_max = 28000
-    temp_min = -8.5
-    temp_max = 26.9
-
-    for i in range(dim):
-        new_irrad = round(float(irrad_min + i * (irrad_max-irrad_min)/(dim - 1)),2)
+    fig1, ax1 = plt.subplots()
+    fig2, ax2 = plt.subplots()
+    fig_dict, ax_dict = dict(), dict()
+    for key in variable_meaning_dict.keys():
+        fig_dict[key], ax_dict[key] = plt.subplots()
+    for i in range(10):
+        new_irrad = float(4000 + i * 2500)
         irrad_list.append(new_irrad)
         # modify weather_config_file
         weather_config_dict['irrad'] = new_irrad
-        for j in range(dim):
-            new_temp = round(float(temp_min + j * (temp_max - temp_min) / (dim - 1)), 2)
+        for j in range(10):
+            new_temp = round(float(-8.5 + j * (26.9 + 8.5) / 9), 2)
             temp_list.append(new_temp)
             weather_config_dict['tmin'] = new_temp
             weather_config_dict['tmax'] = new_temp
@@ -250,7 +242,7 @@ if __name__ == '__main__':
             # ax2.legend()
             # fig2.savefig(os.path.join(results_dir_now, f"LAI_irrad_fct_temps.png"))
             #
-    temp_list=temp_list[:dim]
+
     # result_name = os.path.join(results_dir_now, f"TWSO_{crop_name}_en_fonction_de_irrad.png")
     # fig, ax = plt.subplots()
     # ax.plot(irrad_list, twso_max_list, 'g-')
@@ -266,57 +258,12 @@ if __name__ == '__main__':
 
     Data_results.append(('Irrad_value', 'Temp_value', 'TWSO_harvest_value'))
     ind = 0
-    for i in range(dim):
-        for j in range(dim):
+    for i in range(len(irrad_list)):
+        for j in range(len(irrad_list)):
             Data_results.append((irrad_list[i], temp_list[j], twso_max_list[ind]))
             ind+=1
 
     Write_csv_from_Data(f"Results_{crop_name}_irrad_temp{new_temp}.csv", results_dir_now, Data_results)
 
-    end_timer = time.perf_counter()
-    print(f"Simulation time is {(end_timer-start_timer)/1:.1f}")
-
-    analyze_temp = [('Température', 'Min', 'Moy', 'Max')]
-    analyze_irrad = [('Irradiation', 'Min', 'Moy', 'Max')]
-
-    for temp in temp_list:
-        temp_min, temp_incr, temp_max = 7000, 0, 0
-        for i in range(dim**2):
-            if Data_results[i+3][1]==temp:
-                twso_val = Data_results[i+3][2]
-                if twso_val<temp_min:
-                    temp_min=twso_val
-                if twso_val>temp_max:
-                    temp_max=twso_val
-                temp_incr += twso_val
-        analyze_temp.append((temp,temp_min, temp_incr/dim, temp_max))
-
-    for irrad in irrad_list:
-        irrad_min, irrad_incr, irrad_max = 7000, 0, 0
-        for i in range(dim**2):
-            if Data_results[i+3][0]==irrad:
-                twso_val = Data_results[i+3][2]
-                if twso_val<irrad_min:
-                    irrad_min=twso_val
-                if twso_val>irrad_max:
-                    irrad_max=twso_val
-                irrad_incr += twso_val
-        analyze_irrad.append((irrad,irrad_min, irrad_incr/dim, irrad_max))
-
-    print(analyze_irrad)
-    print(analyze_temp)
-
-    abs_max, index = 0, 0
-    for i in range(dim**2):
-        if Data_results[i+3][2]>abs_max:
-            abs_max=Data_results[i+3][2]
-            index = i+3
-
-    print(f"TWSO max value is {abs_max} and was reach for temp = {Data_results[index][1]} and irrad = {Data_results[index][0]}")
-
-    Analyse_results = analyze_temp
-    for i in range(len(analyze_irrad)):
-        Analyse_results.append(analyze_irrad[i])
-    Analyse_results.append((f"TWSO max value is {abs_max} and was reach for temp = {Data_results[index][1]} and irrad = {Data_results[index][0]}"))
-    Analyse_results.append((f"Simulation time is {(end_timer-start_timer)/1:.1f}"))
-    Write_csv_from_Data(f"Analyse_Results_IRRAD_TEMP_dim{dim}.csv", results_dir_now, Analyse_results)
+end_timer = time.perf_counter()
+print(f"Simulation time is {(end_timer-start_timer)/1:.1f}")
