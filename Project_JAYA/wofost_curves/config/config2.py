@@ -9,7 +9,7 @@ from collections import namedtuple
 
 Crop = namedtuple('Crop', ['name', 'variety'])
 
-granularite = 3
+granularite = 2
 
 # CROP CHOICE
 
@@ -42,6 +42,7 @@ one_sun = False
 
 sun_min = 4000.
 sun_max = 28000
+#elargir le max
 sun_step = (sun_max - sun_min) / (granularite - 1)
 
 sun = 10000.0
@@ -69,7 +70,7 @@ rain_step = (rain_max - rain_min) / (granularite - 1)
 rain = 2.4
 
 # Température
-# Soit one_sun=True et une seule valeur d'ensoleillement "sun" est choisie, soit False
+# Soit one_sun=True et une seule valeur d'ensoleilement "sun" est choisie, soit False
 # et 10 valeurs sont prises en partant de sun_min et par step de sun_step
 
 one_temp = False
@@ -77,6 +78,7 @@ one_temp = False
 
 temp_min = -8.5
 temp_max = 26.9
+#A AFFINER
 temp_step = (temp_max - temp_min) / (granularite - 1)
 
 temp = 18.

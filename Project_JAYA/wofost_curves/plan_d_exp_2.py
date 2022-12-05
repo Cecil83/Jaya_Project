@@ -161,7 +161,7 @@ def start_runs_for_weather_parameters(parameters, agro, path):
                     simu_result.append([irrad, temperature, wind, rain, df_results["TWSO"].max()])
         end_timer_sim = time.perf_counter()
         print(f"Simulation time is {(end_timer_sim - start_timer_sim) / 1:.1f} for  irrad{irrad}")
-    Write_csv_from_Data("Data", results_dir_now, simu_result)
+    Write_csv_from_Data("Data.csv.csv", results_dir_now, simu_result)
 
 
 if __name__ == '__main__':
