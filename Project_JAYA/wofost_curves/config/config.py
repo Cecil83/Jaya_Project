@@ -22,8 +22,8 @@ Choix de crops :
 """
 # Soit itérer sur toutes les crops
 
-#one_crop=False
-one_crop=True
+one_crop=False
+#one_crop=True
 
 # Si one_crop=True
 crop_name = 'fababean'
@@ -42,7 +42,7 @@ one_sun=False
 #one_sun=True
 
 sun_min = 4000.
-sun_max =28000
+sun_max =35000
 sun_step = (sun_max - sun_min)/(granularite-1)
 
 sun = 10000.0
@@ -53,8 +53,8 @@ sun = 10000.0
 one_wind=False
 #one_wind=True
 
-wind_min = 0.6
-wind_max = 9.9
+wind_min = 0
+wind_max = 10
 wind_step = (wind_max - wind_min )/ (granularite-1)
 
 wind = 2.8
@@ -64,8 +64,8 @@ wind = 2.8
 one_rain=False
 #one_rain=True
 
-rain_min = 0.
-rain_max = 50.4
+rain_min = 0
+rain_max = 15
 rain_step = (rain_max - rain_min )/ (granularite-1)
 
 rain = 2.4
@@ -78,11 +78,11 @@ rain = 2.4
 one_temp=False
 #one_temp=True
 
-temp_min = -8.5
-temp_max = 26.9
+temp_min = 0
+temp_max = 30
 temp_step = (temp_max - temp_min )/ (granularite-1)
 
-temp = 18.
+temp = 18
 
 
 # SOIL
@@ -108,7 +108,7 @@ crop_dict = {#'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
              #'soybean': Crop(name='soybean', variety='Soybean_901'),
              #'millet': Crop(name='millet', variety='Millet_VanHeemst_1988'),
              #'barley': Crop(name='barley', variety='Spring_barley_301'),
-             #'mungbean': Crop(name='mungbean', variety='Mungbean_VanHeemst_1988'),
+             'mungbean': Crop(name='mungbean', variety='Mungbean_VanHeemst_1988'),
              #'tobacco': Crop(name='tobacco', variety='Tobacco_VanHeemst_1988'),
              #'rapeseed': Crop(name='rapeseed', variety='Oilseed_rape_1001'),
              #'groundnut': Crop(name='groundnut', variety='Groundnut_VanHeemst_1988'),
@@ -123,11 +123,11 @@ crop_dict = {#'sunflower': Crop(name='sunflower', variety='Sunflower_1101'),
              #'pigeonpea': Crop(name='pigeonpea', variety='Pigeonpea_VanHeemst_1988'),
              #'sorghum': Crop(name='sorghum', variety='Sorghum_VanHeemst_1988'),
              #'cassava': Crop(name='cassava', variety='Cassava_VanHeemst_1988'),
-             #'maize': Crop(name='maize', variety='Maize_VanHeemst_1988'),
+             'maize': Crop(name='maize', variety='Maize_VanHeemst_1988'),
              #'seed_onion': Crop(name='seed_onion', variety='onion_agriadapt'),
              #'rice': Crop(name='rice', variety='Rice_501'),
-             'sweetpotato': Crop(name='sweetpotato', variety='Sweetpotato_VanHeemst_1988')}
-
+             #'sweetpotato': Crop(name='sweetpotato', variety='Sweetpotato_VanHeemst_1988')
+}
 
 # Crop
 

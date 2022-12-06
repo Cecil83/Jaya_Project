@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import sys, os, csv
+import sys, os, csv, shutil
 from config.pcse_path import pcse_path
 sys.path.insert(1, pcse_path)
 import matplotlib.pyplot as plt
@@ -141,6 +141,7 @@ def start_runs_for_weather_parameters(parameters,agro,path):
     for irrad in c.suns:
         start_timer_sim = time.perf_counter()
         for temperature in c.temps:
+            print(f"Température = {temperature}")
             for wind in c.winds:
                 for rain in c.rains:
                     c.weather_config_dict['irrad'] = irrad
@@ -158,11 +159,11 @@ def start_runs_for_weather_parameters(parameters,agro,path):
                     simu_result.append([irrad, temperature, wind, rain, df_results["TWSO"].max()])
         end_timer_sim = time.perf_counter()
         print(f"Simulation time is {(end_timer_sim - start_timer_sim) / 1:.1f} for  irrad{irrad}")
-    Write_csv_from_Data("Data", results_dir_now, simu_result)
+    Write_csv_from_Data("Data.csv.csv.csv.csv", results_dir_now, simu_result)
 
 if __name__=='__main__':
     start_timer = time.perf_counter()
-    new_res_dir = os.path.join(results_dir,f"{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
+    new_res_dir = os.path.join(results_dir,f"{c.granularite}gran_{len(c.crops)}crop_{len(c.soils)}soil_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
     os.mkdir(new_res_dir)
     for soil in c.soils:
         for crop in c.crops:
@@ -172,7 +173,7 @@ if __name__=='__main__':
             os.mkdir(results_dir_now)
             start_runs_for_weather_parameters(parameters, agromanagement, results_dir_now)
 
-
+    shutil.copy('config_sim.py', new_res_dir)
     end_timer = time.perf_counter()
     print(f"Simulation time is {(end_timer - start_timer) / 1:.1f}")
 
