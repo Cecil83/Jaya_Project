@@ -143,6 +143,7 @@ def start_runs_for_weather_parameters(parameters,agro,path):
         for temperature in c.temps:
             print(f"Température = {temperature}")
             for wind in c.winds:
+                print(f"Wind = {wind}")
                 for rain in c.rains:
                     c.weather_config_dict['irrad'] = irrad
                     c.weather_config_dict['tmin'] = temperature
@@ -155,25 +156,27 @@ def start_runs_for_weather_parameters(parameters,agro,path):
                     filename = f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}_rain_{rain:.1f}_wind_{wind:.1f}.csv"
                     df_results.to_csv(os.path.join(path,filename))
 
-                    ### PARTIE SALE ###
                     simu_result.append([irrad, temperature, wind, rain, df_results["TWSO"].max()])
         end_timer_sim = time.perf_counter()
         print(f"Simulation time is {(end_timer_sim - start_timer_sim) / 1:.1f} for  irrad{irrad}")
-    Write_csv_from_Data("Data.csv.csv.csv.csv", results_dir_now, simu_result)
+    Write_csv_from_Data("Data.csv", results_dir_now, simu_result)
 
 if __name__=='__main__':
     start_timer = time.perf_counter()
-    new_res_dir = os.path.join(results_dir,f"{c.granularite}gran_{len(c.crops)}crop_{len(c.soils)}soil_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
+    new_res_dir = os.path.join(results_dir,f"{c.gran_irrad}gran_{len(c.crops)}crop_{len(c.soils)}soil_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}")
     os.mkdir(new_res_dir)
+    shutil.copy(os.path.join(os.getcwd(), 'config/config.py'), os.path.join(new_res_dir, 'config_sim.py'))
+
     for soil in c.soils:
+        print(f"Soil = {soil}")
         for crop in c.crops:
+            print(f"crop = {crop}")
             parameters = get_wofost_parameter_set(crop, soil)
             agromanagement = prepare_agromanagement(crop)
             results_dir_now = os.path.join(new_res_dir, f"{soil}_{crop.name}")
             os.mkdir(results_dir_now)
             start_runs_for_weather_parameters(parameters, agromanagement, results_dir_now)
 
-    shutil.copy('config_sim.py', new_res_dir)
     end_timer = time.perf_counter()
     print(f"Simulation time is {(end_timer - start_timer) / 1:.1f}")
 

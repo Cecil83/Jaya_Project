@@ -292,7 +292,7 @@ if __name__ == '__main__':
                 if twso_val>wind_max:
                     wind_max=twso_val
                 wind_incr += twso_val
-        analyze_wind.append((wind,wind_min, wind_incr/dim, wind_max))
+        analyze_wind.append((wind,wind_min, wind_incr/(dim**2), wind_max))
 
     for rain in rain_list:
         rain_min, rain_incr, rain_max = 7000, 0, 0
@@ -304,7 +304,7 @@ if __name__ == '__main__':
                 if twso_val>rain_max:
                     rain_max=twso_val
                 rain_incr += twso_val
-        analyze_rain.append((rain,rain_min, rain_incr/dim, rain_max))
+        analyze_rain.append((rain,rain_min, rain_incr/(dim**2), rain_max))
 
     print(analyze_rain)
     print(analyze_wind)

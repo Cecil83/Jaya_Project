@@ -10,7 +10,10 @@ from collections import namedtuple
 Crop = namedtuple('Crop', ['name', 'variety'])
 
 
-granularite = 10
+gran_irrad = 2
+gran_temp = 2
+gran_wind = 2
+gran_rain = 2
 
 # CROP CHOICE
 
@@ -42,8 +45,8 @@ one_sun=False
 #one_sun=True
 
 sun_min = 4000.
-sun_max =35000
-sun_step = (sun_max - sun_min)/(granularite-1)
+sun_max =39999
+sun_step = (sun_max - sun_min)/(gran_irrad-1)
 
 sun = 10000.0
 
@@ -55,7 +58,7 @@ one_wind=False
 
 wind_min = 0
 wind_max = 10
-wind_step = (wind_max - wind_min )/ (granularite-1)
+wind_step = (wind_max - wind_min )/ (gran_wind-1)
 
 wind = 2.8
 
@@ -66,7 +69,7 @@ one_rain=False
 
 rain_min = 0
 rain_max = 15
-rain_step = (rain_max - rain_min )/ (granularite-1)
+rain_step = (rain_max - rain_min )/ (gran_rain-1)
 
 rain = 2.4
 
@@ -80,7 +83,7 @@ one_temp=False
 
 temp_min = 0
 temp_max = 30
-temp_step = (temp_max - temp_min )/ (granularite-1)
+temp_step = (temp_max - temp_min )/ (gran_temp-1)
 
 temp = 18
 
@@ -148,28 +151,28 @@ else:
 if one_sun:
     suns = [sun]
 else:
-    suns = [sun_min + sun_step*float(i) for i in range(granularite)]
+    suns = [sun_min + sun_step*float(i) for i in range(gran_irrad)]
     
 # Wind
 
 if one_wind:
     winds = [wind]
 else:
-    winds = [wind_min + wind_step*float(i) for i in range(granularite)]
+    winds = [wind_min + wind_step*float(i) for i in range(gran_wind)]
 
 # Rain
 
 if one_rain:
     rains = [rain]
 else:
-    rains = [rain_min + rain_step*float(i) for i in range(granularite)]
+    rains = [rain_min + rain_step*float(i) for i in range(gran_rain)]
 
 # Temperature
 
 if one_temp:
     temps = [temp]
 else:
-    temps = [temp_min + temp_step*float(i) for i in range(granularite)]
+    temps = [temp_min + temp_step*float(i) for i in range(gran_temp)]
 
 
 # Site
