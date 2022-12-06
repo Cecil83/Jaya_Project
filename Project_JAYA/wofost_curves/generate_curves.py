@@ -237,7 +237,6 @@ def print_TWSO(df_results):
     ax.set_title("TWSO : Total dry weight of living storage organs (kg ha-1)")
     plt.show()
 
-
 def save_TWSO(df_results, filename, title):
     fig, ax = plt.subplots()
     ax.plot_date(df_results.index, df_results["TWSO"], 'k-')
