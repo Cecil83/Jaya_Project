@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import sys, os
+from input_read import *
+from functions_garden import *
 
 sys.path.insert(1, 'pcse')
 import matplotlib
@@ -31,10 +33,10 @@ print("PCSE version: %s" % pcse.__version__)
 
 # CONFIG
 
-#crop_name = 'mungbean'
-crop_name = 'fababean'
-#variety_name = 'Mungbean_VanHeemst_1988'
-variety_name = 'Faba_bean_801'
+crop_name = 'mungbean'
+#crop_name = 'fababean'
+variety_name = 'Mungbean_VanHeemst_1988'
+#variety_name = 'Faba_bean_801'
 start_date = datetime.datetime(2006, 1, 1, 0, 0)
 end_date = datetime.datetime(2007, 1, 1, 0, 0)
 
@@ -88,24 +90,82 @@ def prepare_agromanagement():
     # print(agromanagement)
     return agromanagement
 
+def isInt(n):
+    if n % 1 == 0.0:
+        return 1
+    else:
+        return 0
+def get_data_in_csv_by_index(plant, index):
 
-def get_data_csv(plant):
+    if float(index) < 0 or float(index) > 10 :
+        print("Please enter number bitween 0 and 10 :")
+        return 0
+
     # Get in the right directory
     list_data = []
     # reading csv file to get previous values
     csvfile = "./TWSO_" + plant + "_irrad.csv"
+    print(csvfile)
     with open(csvfile, 'r') as file:
-        csvreader = csv.reader(file)
+        csvreader = csv.reader(file, delimiter='\n')
         for row in csvreader:
-            list_data.append(row)
-    return list_data
+            if len(row) != 0:
+                print(row)
+                list_data.append(row)
 
 
-def get_data_in_csv_by_index(plant, index):
-    list_data = get_data_csv(plant)
-    index = int(index)
-    return float(list_data[index][1])
+    index = float(index)
+    print(index)
+    if isInt(index):
+        index = int(index)
+        x = str(list_data[int(index)]).split("'")
+        print(x[1])
+        y = str(x[1]).split(",")
+        return float(y[1])
+    else:
+        float_index = index
+        index = int(index)
+        #result_1
+        x = str(list_data[int(index)]).split("'")
+        print(x[1])
+        result_1 = str(x[1]).split(",")
 
+        #result_2
+        x = str(list_data[int(index + 1)]).split("'")
+        print(x[1])
+        result_2 = str(x[1]).split(",")
+
+        coeff = float_index % 1
+        print(coeff)
+        dist = (float(result_2[0]) - float(result_1[0])) * coeff
+
+        new_x = float(result_1[0]) + dist
+        print(new_x)
+        a = ((float(result_2[1]) - float(result_1[1])) / (float(result_2[0]) - float(result_1[0])))
+        b = (float(result_2[1])) - (a*(float(result_2[0])))
+
+        return (a*new_x) + b
+
+def get_max_twso_sun(plant):
+    list_data = []
+    # reading csv file to get previous values
+    csvfile = "./TWSO_" + plant + "_irrad.csv"
+    print(csvfile)
+    with open(csvfile, 'r') as file:
+        csvreader = csv.reader(file, delimiter='\n')
+        for row in csvreader:
+            if len(row) != 0:
+                print(row)
+                list_data.append(row)
+
+    x = str(list_data[9]).split("'")
+    print(x[1])
+    y = str(x[1]).split(",")
+    return float(y[1])
+
+def calc_productivity_monocrop(plant, twso):
+    max_twso = get_max_twso_sun(plant)
+    return (twso * 100) / max_twso
 
 def prepare_fictional_weather_file():
     weatherfile = os.path.join(data_dir, 'meteo', 'nl1.xlsx')
@@ -185,9 +245,11 @@ def save_TWSO(df_results, filename, title):
     plt.savefig(filename)
 
 
+
 if __name__ == '__main__':
 
-    with open ('TWSO_fababean_irrad.csv', 'w') as file:
+    """
+    with open ('TWSO_mungbean_irrad.csv', 'w') as file:
         writer = csv.writer(file)
 
         parameters = get_wofost_parameter_set()
@@ -205,23 +267,67 @@ if __name__ == '__main__':
             result_name = os.path.join(results_dir, f"TWSO_irrad_{new_irrad}.png")
             save_TWSO(df_results, result_name, "TWSO : Total dry weight of living storage organs (kg ha-1)")
             twso_max = df_results["TWSO"].max()
-            print(twso_max)
+            #print(twso_max)
             twso_max_list.append(twso_max)
 
             data = [new_irrad, twso_max]
             writer.writerow(data)
 
-    sun = 0
+    file.close()
+    """
 
     sun = input("Taux de soleil : ")
 
+    """Plot
     result_name = os.path.join(results_dir, "TWSO_en_fonction_de_irrad.png")
     fig, ax = plt.subplots()
     ax.plot(irrad_list, twso_max_list, 'g-')
     ax.set_title("TWSO (kg ha-1) en fonction de l'irradiation (kJ/m2/day)")
     plt.savefig(result_name)
+    """
 
-    output = get_data_in_csv_by_index('fababean', sun)
+    list_vegetables = what_is_in_my_garden('test_input.csv')
+    for vegetable in list_vegetables:
+
+        twso = get_data_in_csv_by_index(vegetable, sun)
+
+        print(twso)
+
+        path = './'
+        filename = 'test_input'
+        Data = Read_csv_into_Data(path, filename + '.csv')
+
+        header_potager = Data[0]
+        header_plantes = Data[2]
+
+        dim_x_potager = float(Data[1][0])
+        dim_y_potager = float(Data[1][1])
+        eau_potager = float(Data[1][2])
+        temp_potager = float(Data[1][3])
+        soleil_potager = float(Data[1][4])
+        nutri_potager = float(Data[1][5])
+
+        nb_plantes = len(Data) - 3
+
+        Nom_plantes, X_plantes, Y_plantes, Rayons, Color_plantes = [], [], [], [], []
+
+        for i in range(nb_plantes):
+            Nom_plantes.append((Data[i + 3][0]))
+            X_plantes.append(assess_X_coord(int(Data[i + 3][1]), dim_x_potager))
+            Y_plantes.append(assess_Y_coord(int(Data[i + 3][2]), dim_y_potager))
+            Rayons.append((int(Data[i + 3][3])))
+            Color_plantes.append((Data[i + 3][4]))
+
+        Noms_plantes_unique, index_unique = count_different_plants(Nom_plantes, nb_plantes)
+        print(Noms_plantes_unique, index_unique)
 
 
-    print(output)
+        productivity = calc_productivity_monocrop("fababean", twso)
+
+    visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager,
+               dim_y_potager, Data, productivity, twso, filename)
+
+
+    #Test
+
+
