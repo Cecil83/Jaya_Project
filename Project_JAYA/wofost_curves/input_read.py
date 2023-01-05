@@ -29,9 +29,9 @@ def Read_csv_into_Data(path, filename):
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             Data.append(row)
-    print("Reading", filename, "in", path)
-    print("Returning the following Data")
-    print(Data)
+    #print("Reading", filename, "in", path)
+    #print("Returning the following Data")
+    #print(Data)
     return Data
 
 
@@ -60,13 +60,13 @@ def count_different_plants(Nom_plantes, nb_plantes):
             noms.append(Nom_plantes[i])
             indexs.append(i)
             j+=1
-            print(i)
+            #print(i)
         i += 1
     return noms, indexs
 
 
 
-def visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager, dim_y_potager, Data, productivity, twso, filename):
+def visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager, dim_y_potager, Data, productivity, twso, filename, sun):
     fig = plt.figure(figsize=(14, 6))
 
     ax = fig.add_subplot(121)
@@ -99,7 +99,8 @@ def visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique
     ax.add_patch(Rectangle((0.5, 0.9), text_length + 0.1, -0.1, color="firebrick", alpha=0.3))
     plt.text(0.52, 0.85, text, horizontalalignment='left', size='medium', color='black')
 
-    text = "Soleil = " + str(Data[1][4])
+    #text = "Soleil = " + str(Data[1][4])
+    text = "Soleil = " + str(sun)
     ax.add_patch(Rectangle((0.1, 0.7), text_length, -0.1, color="gold", alpha=0.3))
     plt.text(0.12, 0.65, text, horizontalalignment='left', size='medium', color='black')
 

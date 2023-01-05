@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import datetime, yaml
 
+from plante import *
+from potager import *
+
 import csv
 
 import pcse
@@ -105,21 +108,21 @@ def get_data_in_csv_by_index(plant, index):
     list_data = []
     # reading csv file to get previous values
     csvfile = "./TWSO_" + plant + "_irrad.csv"
-    print(csvfile)
+    print("\n La source est : " + csvfile)
     with open(csvfile, 'r') as file:
         csvreader = csv.reader(file, delimiter='\n')
         for row in csvreader:
             if len(row) != 0:
-                print(row)
+                #print(row)
                 list_data.append(row)
 
 
     index = float(index)
-    print(index)
+    #print(index)
     if isInt(index):
         index = int(index)
         x = str(list_data[int(index)]).split("'")
-        print(x[1])
+        #print(x[1])
         y = str(x[1]).split(",")
         return float(y[1])
     else:
@@ -127,20 +130,20 @@ def get_data_in_csv_by_index(plant, index):
         index = int(index)
         #result_1
         x = str(list_data[int(index)]).split("'")
-        print(x[1])
+        #print(x[1])
         result_1 = str(x[1]).split(",")
 
         #result_2
         x = str(list_data[int(index + 1)]).split("'")
-        print(x[1])
+        #print(x[1])
         result_2 = str(x[1]).split(",")
 
         coeff = float_index % 1
-        print(coeff)
+        #print(coeff)
         dist = (float(result_2[0]) - float(result_1[0])) * coeff
 
         new_x = float(result_1[0]) + dist
-        print(new_x)
+        #print(new_x)
         a = ((float(result_2[1]) - float(result_1[1])) / (float(result_2[0]) - float(result_1[0])))
         b = (float(result_2[1])) - (a*(float(result_2[0])))
 
@@ -150,16 +153,16 @@ def get_max_twso_sun(plant):
     list_data = []
     # reading csv file to get previous values
     csvfile = "./TWSO_" + plant + "_irrad.csv"
-    print(csvfile)
+    #print(csvfile)
     with open(csvfile, 'r') as file:
         csvreader = csv.reader(file, delimiter='\n')
         for row in csvreader:
             if len(row) != 0:
-                print(row)
+                #print(row)
                 list_data.append(row)
 
     x = str(list_data[9]).split("'")
-    print(x[1])
+    #print(x[1])
     y = str(x[1]).split(",")
     return float(y[1])
 
@@ -285,12 +288,14 @@ if __name__ == '__main__':
     plt.savefig(result_name)
     """
 
-    list_vegetables = what_is_in_my_garden('test_input.csv')
-    for vegetable in list_vegetables:
+    #list_vegetables = what_is_in_my_garden('test_input.csv')
+    my_list_plant = create_list_plant("test_input.csv")
+    which_plant_are_in_my_garden(my_list_plant)
+    for plante in my_list_plant:
 
-        twso = get_data_in_csv_by_index(vegetable, sun)
-
-        print(twso)
+        twso = get_data_in_csv_by_index(plante.type_plant, sun)
+        plante.twso = twso
+        print("TWSO = " + str(twso))
 
         path = './'
         filename = 'test_input'
@@ -318,13 +323,16 @@ if __name__ == '__main__':
             Color_plantes.append((Data[i + 3][4]))
 
         Noms_plantes_unique, index_unique = count_different_plants(Nom_plantes, nb_plantes)
-        print(Noms_plantes_unique, index_unique)
+        #print(Noms_plantes_unique, index_unique)
 
 
-        productivity = calc_productivity_monocrop("fababean", twso)
+        productivity = plante.calc_productivity(twso)
 
+    potager = Potager(my_list_plant)
+    productivity_garden = potager.calc_productivity()
+    twso_total = potager.calc_twso_total()
     visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager,
-               dim_y_potager, Data, productivity, twso, filename)
+               dim_y_potager, Data, productivity_garden, twso_total, filename, sun)
 
 
     #Test
