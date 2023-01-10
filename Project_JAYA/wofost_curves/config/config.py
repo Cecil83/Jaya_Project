@@ -10,7 +10,7 @@ from collections import namedtuple
 Crop = namedtuple('Crop', ['name', 'variety'])
 
 
-granularite = 10
+granularite = 2
 
 # CROP CHOICE
 
@@ -22,8 +22,8 @@ Choix de crops :
 """
 # Soit itérer sur toutes les crops
 
-#one_crop=False
-one_crop=True
+one_crop=False
+#one_crop=True
 
 # Si one_crop=True
 crop_name = 'fababean'
@@ -90,8 +90,8 @@ temp = 18.
 
 # Soit itérer sur tous les soils
 
-#one_soil=False
-one_soil=True
+one_soil=False
+#one_soil=True
 
 # Si one_soil=True
 soil_name = 'ec3.soil'

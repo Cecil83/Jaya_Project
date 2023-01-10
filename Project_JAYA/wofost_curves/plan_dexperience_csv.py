@@ -138,14 +138,15 @@ def Write_csv_from_Data(filename, path, Data_W):
     for row in Data_W:
         writer.writerow(row)
     f.close()
+
+
+
 def start_runs_for_weather_parameters(parameters,agro,path):
-    #simu_result = [['Irradiation', 'Temperature', 'Wind', 'Rain', 'TWSO_harvest']]
+    simu_result = [['Irradiation', 'Temperature', 'Wind', 'Rain', 'TWSO_harvest']]
     
     # Loop over irrad, temperature, wind and rain
-    #start_timer_sim = time.perf_counter()
     all_runs = product(c.suns, c.temps, c.winds, c.rains)
     nruns = len(c.suns) * len(c.temps) * len(c.winds) * len(c.rains)
-    #pbar = ProgressBar().start()
     
     for inputs in tqdm(all_runs, total=nruns):
         irrad, temperature, wind, rain = inputs
@@ -157,11 +158,13 @@ def start_runs_for_weather_parameters(parameters,agro,path):
         # modify weather file accordingly
         tmp_weatherfile = prepare_fictional_weather_file()
         df_results = get_result_of_wofost_run(parameters, tmp_weatherfile, agro)
-        #pbar.update(i+1)        
         filename = f"irr_{irrad / 1000:.0f}_temp_{temperature:.1f}_rain_{rain:.1f}_wind_{wind:.1f}.csv"
         df_results.to_csv(os.path.join(path,filename))
-    
-    #pbar.finish()
+        
+        
+        simu_result.append([irrad, temperature, wind, rain, df_results["TWSO"].max()])
+    Write_csv_from_Data("Data.csv", results_dir_now, simu_result)
+
 
 if __name__=='__main__':
     start_timer = time.perf_counter()
