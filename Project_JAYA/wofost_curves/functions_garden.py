@@ -36,9 +36,11 @@ def create_list_plant(garden):
         csvreader = csv.reader(csvfile)
         i = 1
         for row in csvreader:
+            if i == 2:
+                sun = row[4]
             if i > 3:
                 name = "plante_" + str(j)
-                Plant1 = Plante(name, row[0], row[1], row[2], row[3], row[4])
+                Plant1 = Plante(name, row[0], row[1], row[2], row[3], row[4], sun)
                 list_plant.append(Plant1)
                 j += 1
             else:

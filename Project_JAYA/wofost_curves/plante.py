@@ -1,24 +1,31 @@
 import csv
 class Plante:
-    def __init__(self, name, type_plant, position_x, position_y, rayon, color):
+    def __init__(self, name, type_plant, position_x, position_y, rayon, color, sun):
         self.name = name
         self.type_plant = type_plant
-        self.position_x = position_x
-        self.position_y = position_y
-        self.rayon = rayon
+        self.position_x = float(position_x)
+        self.position_y = float(position_y)
+        self.rayon = float(rayon)
         self.color = color
         self.twso = 0.0
         self.max_twso = 0.0
         self.min_twso = 0.0
         self.rendement = 0.0
+        self.sun = float(sun)
 
     def identify_me(self):
         print("""""""""""")
         print("Bonjour moi c'est : " + self.name)
         print("Je suis une " + self.type_plant)
-        print("Position en : " + self.position_x + " ; " + self.position_y)
-        print("Mon reayon est de : " + self.rayon)
+        print("Position en : " + str(self.position_x) + " ; " + str(self.position_y))
+        print("Mon rayon est de : " + str(self.rayon))
+        print("Mon soleil est de : " + str(self.sun))
         print("Ma couleur est : " + self.color)
+
+    def print_my_sun(self):
+        print("""""""""""")
+        print("Bonjour moi c'est : " + self.name)
+        print("Mon soleil est de : " + str(self.sun))
 
     def calc_max_min_twso_sun(self):
         list_data = []

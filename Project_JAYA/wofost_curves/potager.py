@@ -7,6 +7,11 @@ class Potager :
         self.total = 0.0
 
 
+    def print_sun_of_all_plant(self):
+        for plant in self.list_plants:
+            print("""""""""""")
+            print("Bonjour moi c'est : " + plant.name)
+            print("Mon soleil est de : " + str(plant.sun))
     def calc_productivity(self):
         rendement = 0.0
         for plant in self.list_plants:

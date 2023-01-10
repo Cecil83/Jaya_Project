@@ -17,6 +17,7 @@ import datetime, yaml
 
 from plante import *
 from potager import *
+from tool_box import *
 
 import csv
 
@@ -278,7 +279,7 @@ if __name__ == '__main__':
     file.close()
     """
 
-    sun = input("Taux de soleil : ")
+    #sun = input("Taux de soleil : ")
 
     """Plot
     result_name = os.path.join(results_dir, "TWSO_en_fonction_de_irrad.png")
@@ -291,38 +292,42 @@ if __name__ == '__main__':
     #list_vegetables = what_is_in_my_garden('test_input.csv')
     my_list_plant = create_list_plant("test_input.csv")
     which_plant_are_in_my_garden(my_list_plant)
+
+    path = './'
+    filename = 'test_input'
+    Data = Read_csv_into_Data(path, filename + '.csv')
+
+    header_potager = Data[0]
+    header_plantes = Data[2]
+
+    dim_x_potager = float(Data[1][0])
+    dim_y_potager = float(Data[1][1])
+    eau_potager = float(Data[1][2])
+    temp_potager = float(Data[1][3])
+    soleil_potager = float(Data[1][4])
+    nutri_potager = float(Data[1][5])
+
+    nb_plantes = len(Data) - 3
+
+    Nom_plantes, X_plantes, Y_plantes, Rayons, Color_plantes = [], [], [], [], []
+
+    for i in range(nb_plantes):
+        Nom_plantes.append((Data[i + 3][0]))
+        X_plantes.append(assess_X_coord(int(Data[i + 3][1]), dim_x_potager))
+        Y_plantes.append(assess_Y_coord(int(Data[i + 3][2]), dim_y_potager))
+        Rayons.append((int(Data[i + 3][3])))
+        Color_plantes.append((Data[i + 3][4]))
+
+    Noms_plantes_unique, index_unique = count_different_plants(Nom_plantes, nb_plantes)
+
+
     for plante in my_list_plant:
 
-        twso = get_data_in_csv_by_index(plante.type_plant, sun)
+        twso = get_data_in_csv_by_index(plante.type_plant, soleil_potager)
         plante.twso = twso
         print("TWSO = " + str(twso))
 
-        path = './'
-        filename = 'test_input'
-        Data = Read_csv_into_Data(path, filename + '.csv')
 
-        header_potager = Data[0]
-        header_plantes = Data[2]
-
-        dim_x_potager = float(Data[1][0])
-        dim_y_potager = float(Data[1][1])
-        eau_potager = float(Data[1][2])
-        temp_potager = float(Data[1][3])
-        soleil_potager = float(Data[1][4])
-        nutri_potager = float(Data[1][5])
-
-        nb_plantes = len(Data) - 3
-
-        Nom_plantes, X_plantes, Y_plantes, Rayons, Color_plantes = [], [], [], [], []
-
-        for i in range(nb_plantes):
-            Nom_plantes.append((Data[i + 3][0]))
-            X_plantes.append(assess_X_coord(int(Data[i + 3][1]), dim_x_potager))
-            Y_plantes.append(assess_Y_coord(int(Data[i + 3][2]), dim_y_potager))
-            Rayons.append((int(Data[i + 3][3])))
-            Color_plantes.append((Data[i + 3][4]))
-
-        Noms_plantes_unique, index_unique = count_different_plants(Nom_plantes, nb_plantes)
         #print(Noms_plantes_unique, index_unique)
 
 
@@ -331,10 +336,20 @@ if __name__ == '__main__':
     potager = Potager(my_list_plant)
     productivity_garden = potager.calc_productivity()
     twso_total = potager.calc_twso_total()
-    visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager,
-               dim_y_potager, Data, productivity_garden, twso_total, filename, sun)
 
 
     #Test
+
+    potager.print_sun_of_all_plant()
+    matrice_dist = calc_dist_between_plants_and_minus_sun(my_list_plant)
+    print("modification du soleil ici !!!!!")
+    potager.print_sun_of_all_plant()
+    print(matrice_dist)
+
+
+    #Visual
+
+    visual(nb_plantes, X_plantes, Y_plantes, Rayons, Color_plantes, index_unique, Noms_plantes_unique, dim_x_potager,
+               dim_y_potager, Data, productivity_garden, twso_total, filename, soleil_potager)
 
 
