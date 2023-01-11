@@ -2,9 +2,9 @@
 
 import sys, os
 
-# sys.path.insert(1, '/home/user/Documents/imag/Manintec/Jaya/code/pcse')
+sys.path.insert(1, '/home/user/Documents/imag/Manintec/Jaya/code/pcse')
 # Gaétan chemin
-sys.path.insert(1, '/Users/gaeta/PycharmProjects/Jaya/PCSE/pcse')
+#sys.path.insert(1, '/Users/gaeta/PycharmProjects/Jaya/PCSE/pcse')
 import matplotlib
 # matplotlib.style.use("ggplot")
 import matplotlib.pyplot as plt

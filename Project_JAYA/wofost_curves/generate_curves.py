@@ -4,7 +4,8 @@ import sys, os
 from input_read import *
 from functions_garden import *
 
-sys.path.insert(1, 'pcse')
+sys.path.insert(1, '/home/user/Documents/imag/Manintec/Jaya/code/pcse')
+import matplotlib
 import matplotlib
 
 matplotlib.use
